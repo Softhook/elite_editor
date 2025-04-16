@@ -14,7 +14,7 @@
     <script src="editor.js"></script> <!-- Make sure this points to the latest editor.js -->
     <style>
         body {
-            margin: 0; padding-bottom: 20px; /* Add padding at bottom */
+            margin: 0; padding-bottom: 5px; /* Add padding at bottom */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -22,7 +22,7 @@
             background-color: #f8f8f8; /* Light background for contrast */
         }
         main {
-            margin-top: 15px;
+            margin-top: 5px;
             border: 1px solid #ccc; /* Border around canvas */
             width: 600px; /* Match canvas width */
             height: 450px; /* Match canvas height */
@@ -101,11 +101,6 @@
         <input type="number" id="strokeWeightInput" value="1" min="0" step="0.5">
      </div>
 
-     <!-- Instructions Area -->
-     <div id="instructions">
-        Select shape layer by clicking inside it. Click & drag vertex handles to move. SHIFT+Click handles to multi-select. Select vertex & press DELETE/BACKSPACE to remove. Use 'Add Vertex Mode' then click an edge to add point. Use color controls for selected shape. SHIFT+DELETE removes selected shape layer. Click & drag selected shape (not handle) to move whole shape.
-        <span id="thargoidWarning" style="color: red; display: none;"> (Thargoid shape is complex and not directly editable here)</span>
-    </div>
 
     <!-- p5.js Canvas Container -->
     <main id="main">
@@ -116,6 +111,13 @@
     <div id="shipDescriptionArea">
         Select a ship to view its description.
     </div>
+
+    <!-- Instructions Area -->
+    <div id="instructions">
+        Select shape layer by clicking inside it. Click & drag vertex handles to move. SHIFT+Click handles to multi-select. Select vertex & press DELETE/BACKSPACE to remove. Use 'Add Vertex Mode' then click an edge to add point. Use color controls for selected shape. SHIFT+DELETE removes selected shape layer. Click & drag selected shape (not handle) to move whole shape.
+        <span id="thargoidWarning" style="color: red; display: none;"> (Thargoid shape is complex and not directly editable here)</span>
+    </div>
+    
 
 </body>
 </html>
