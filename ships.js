@@ -17,7 +17,14 @@ function drawShapeFromData(r, vertexData, fillCol, strokeCol, strokeWeightVal) {
 
 // --- Ship Drawing Functions (Using vertexData) ---
 
-// Original Ships (Viper/Krait names reverted)
+// Original Ships 
+
+function drawACAB(s, thrusting = false) {
+    let r = s / 2; let def = SHIP_DEFINITIONS.ACAB;
+    drawShapeFromData(r, def.vertexData, color(def.fillColor), color(def.strokeColor), def.strokeW);
+    if (thrusting) { fill(255, 200, 0); noStroke(); ellipse(-r, 0, r*0.5, r*0.3); }
+}
+
 function drawSidewinder(s, thrusting = false) {
     let r = s / 2; let def = SHIP_DEFINITIONS.Sidewinder;
     drawShapeFromData(r, def.vertexData, color(def.fillColor), color(def.strokeColor), def.strokeW);
@@ -28,8 +35,8 @@ function drawCobraMkIII(s, thrusting = false) {
     drawShapeFromData(r, def.vertexData, color(def.fillColor), color(def.strokeColor), def.strokeW);
     if (thrusting) { fill(255, 255, 100); noStroke(); ellipse(-r*0.9, r*0.15, r*0.4, r*0.2); ellipse(-r*0.9, -r*0.15, r*0.4, r*0.2); }
 }
-function drawViper(s, thrusting = false) { // REVERTED NAME
-    let r = s / 2; let def = SHIP_DEFINITIONS.Viper; // REVERTED NAME
+function drawViper(s, thrusting = false) {
+    let r = s / 2; let def = SHIP_DEFINITIONS.Viper;
     drawShapeFromData(r, def.vertexData, color(def.fillColor), color(def.strokeColor), def.strokeW);
     if (thrusting) { fill(100, 200, 255); noStroke(); ellipse(-r*0.9, 0, r*0.7, r*0.3); }
 }
@@ -48,8 +55,8 @@ function drawAdder(s, thrusting = false) {
     drawShapeFromData(r, def.vertexData, color(def.fillColor), color(def.strokeColor), def.strokeW);
     if (thrusting) { fill(200, 200, 180); noStroke(); ellipse(-r*0.8, -r*0.1, r*0.4, r*0.3); }
 }
-function drawKrait(s, thrusting = false) { // REVERTED NAME
-     let r = s / 2; let def = SHIP_DEFINITIONS.Krait; // REVERTED NAME
+function drawKrait(s, thrusting = false) { 
+     let r = s / 2; let def = SHIP_DEFINITIONS.Krait; 
      drawShapeFromData(r, def.vertexData, color(def.fillColor), color(def.strokeColor), def.strokeW);
     if (thrusting) { fill(180, 180, 100); noStroke(); ellipse(-r*0.7, r*0.3, r*0.3, r*0.2); ellipse(-r*0.7, -r*0.3, r*0.3, r*0.2); }
 }
@@ -67,7 +74,6 @@ function drawThargoid(s, thrusting = false) { // (Original Thargoid)
     ellipse(0, 0, r*0.5, r*0.5);
 }
 
-// --- First Batch of Added Ships ---
 function drawAspExplorer(s, thrusting = false) {
     let r = s / 2; let def = SHIP_DEFINITIONS.AspExplorer;
     drawShapeFromData(r, def.vertexData, color(def.fillColor), color(def.strokeColor), def.strokeW);
@@ -118,8 +124,6 @@ function drawImperialClipper(s, thrusting = false) {
     drawShapeFromData(r, def.vertexData, color(def.fillColor), color(def.strokeColor), def.strokeW);
     if (thrusting) { fill(80, 180, 255); noStroke(); ellipse(-r * 0.7, r * 0.6, r * 0.5, r * 0.25); ellipse(-r * 0.7, -r * 0.6, r * 0.5, r * 0.25); }
 }
-
-// --- Second Batch of Added Ships (15 New) ---
 
 function drawShardInterceptor(s, thrusting = false) { // Alien 1
     let r = s / 2; let def = SHIP_DEFINITIONS.ShardInterceptor;
@@ -253,6 +257,15 @@ function drawHammerheadCorvette(s, thrusting = false) { // Unique 2
 // --- Global Ship Definitions Object ---
 // Stores base stats AND VERTEX DATA for each ship type.
 const SHIP_DEFINITIONS = {
+    "ACAB": {
+        name: "ACAB", role: "Police", sizeCategory: "Small", size: 28,
+        baseMaxSpeed: 4.5, baseThrust: 0.07, baseTurnRateDegrees: 3.0, baseHull: 60, baseShield: 70, shieldRecharge: 1.0, cargoCapacity: 22,
+        armament: "1 Med Fwd, 2 Small Util?", costCategory: "Low", description: "Standard Police.",
+        drawFunction: drawACAB, vertexData: [ { x: 0.8969, y: 0.0000 }, { x: 0.1469, y: 0.4929 }, { x: -0.6673, y: 0.6286 }, { x: -0.6031, y: 0.0000 }, { x: -0.6673, y: -0.6286 }, { x: 0.1469, y: -0.4929 } ],
+        fillColor: [100, 150, 200],
+        strokeColor: [151, 181, 196],
+        strokeW: 1.00
+    },
     "Adder": {
         name: "Adder", role: "Trader/Explorer", sizeCategory: "Small", size: 28,
         baseMaxSpeed: 4.5, baseThrust: 0.07, baseTurnRateDegrees: 3.0, baseHull: 60, baseShield: 70, shieldRecharge: 1.0, cargoCapacity: 22,
@@ -271,8 +284,10 @@ const SHIP_DEFINITIONS = {
         name: "Asp Explorer", role: "Explorer/Multi-Role", sizeCategory: "Medium", size: 55,
         baseMaxSpeed: 5.5, baseThrust: 0.09, baseTurnRateDegrees: 3.2, baseHull: 150, baseShield: 180, shieldRecharge: 1.3, cargoCapacity: 80,
         armament: "2 Med, 4 Small Fwd", costCategory: "Medium-High", description: "Iconic explorer with excellent visibility and jump range.",
-        drawFunction: drawAspExplorer, vertexData: [ { x: 1.0, y: 0 }, { x: 0.5, y: 0.8 }, { x: -0.4, y: 0.9 }, { x: -0.9, y: 0.3 }, { x: -0.9, y: -0.3 }, { x: -0.4, y: -0.9 }, { x: 0.5, y: -0.8 } ],
-        fillColor: [200, 180, 80], strokeColor: [100, 90, 40], strokeW: 1.5
+        drawFunction: drawAspExplorer, vertexData: [ { x: 1.0000, y: 0.0000 }, { x: 0.4127, y: 0.5133 }, { x: -0.4250, y: 0.8750 }, { x: -0.9000, y: 0.3000 }, { x: -0.9000, y: -0.3000 }, { x: -0.4250, y: -0.8750 }, { x: 0.4127, y: -0.5133 } ],
+        fillColor: [200, 180, 80],
+        strokeColor: [100, 90, 40],
+        strokeW: 1.50
     },
     "BioFrigate": { // NEW - Alien 2
         name: "Bio-Frigate (Alien)", role: "Alien Cruiser", sizeCategory: "Large", size: 90,
@@ -285,15 +300,20 @@ const SHIP_DEFINITIONS = {
         name: "Centurion Gunship", role: "Heavy Fighter", sizeCategory: "Large", size: 72,
         baseMaxSpeed: 4.8, baseThrust: 0.13, baseTurnRateDegrees: 2.6, baseHull: 320, baseShield: 220, shieldRecharge: 1.0, cargoCapacity: 20,
         armament: "Heavy Fwd Cannons", costCategory: "High", description: "Slow, heavily armed and armored gun platform.",
-        drawFunction: drawCenturionGunship, vertexData: [ {x:0.8, y:0}, {x:0.7, y:0.4}, {x:0.2, y:0.8}, {x:-0.7, y:0.9}, {x:-1.0, y:0.6}, {x:-1.0, y:-0.6}, {x:-0.7, y:-0.9}, {x:0.2, y:-0.8}, {x:0.7, y:-0.4} ],
-        fillColor: [100, 105, 115], strokeColor: [160, 165, 175], strokeW: 2.2 // Dark grey blue
+        drawFunction: drawCenturionGunship, vertexData: [ { x: 0.8000, y: 0.0000 }, { x: 0.7000, y: 0.4000 }, { x: 0.0000, y: 0.5048 }, { x: 0.3967, y: 0.6548 }, { x: 0.3896, y: 0.8786 }, { x: -0.7000, y: 0.9000 }, { x: -1.0000, y: 0.6000 }, { x: -1.0000, y: -0.6000 }, { x: -0.7000, y: -0.9000 }, { x: 0.3896, y: -0.8786 }, { x: 0.3967, y: -0.6548 }, { x: 0.0000, y: -0.5048 }, { x: 0.7000, y: -0.4000 } ],
+        fillColor: [100, 105, 115],
+        strokeColor: [160, 165, 175],
+        strokeW: 2.20
     },
     "CobraMkIII": {
         name: "Cobra Mk III", role: "Multi-Role", sizeCategory: "Medium", size: 38,
         baseMaxSpeed: 6.0, baseThrust: 0.10, baseTurnRateDegrees: 3.5, baseHull: 120, baseShield: 100, shieldRecharge: 1.2, cargoCapacity: 44,
         armament: "2 Med Fwd, 2 Small Fwd/Turret?", costCategory: "Medium", description: "The legendary jack-of-all-trades.",
-        drawFunction: drawCobraMkIII, vertexData: [ { x: 1, y: 0 }, { x: 0.3, y: 0.6 }, { x: -0.8, y: 0.7 }, { x: -0.5, y: 0.2 }, { x: -1, y: 0.25 }, { x: -1, y: -0.25 }, { x: -0.5, y: -0.2 }, { x: -0.8, y: -0.7 }, { x: 0.3, y: -0.6 } ],
-        fillColor: [100, 150, 200], strokeColor: [200, 220, 255], strokeW: 1.5
+        drawFunction: drawCobraMkIII, 
+        vertexData: [ { x: 1.0000, y: 0.0000 }, { x: 0.3000, y: 0.5270 }, { x: -0.5045, y: 0.5634 }, { x: -0.5000, y: 0.2000 }, { x: -0.7734, y: 0.1770 }, { x: -0.7734, y: -0.1770 }, { x: -0.5000, y: -0.2000 }, { x: -0.5045, y: -0.5634 }, { x: 0.3000, y: -0.5270 } ],
+        fillColor: [100, 150, 200],
+        strokeColor: [200, 220, 255],
+        strokeW: 1.50
     },
     "DiamondbackExplorer": {
         name: "Diamondback Explorer", role: "Explorer/Light Combat", sizeCategory: "Medium", size: 45,

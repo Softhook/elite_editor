@@ -757,17 +757,46 @@ function straightenMirroredVertices(shape, threshold) {
     else console.log("Straighten Symmetry: No adjustments needed.");
 }
 
+// Inside editor.js
 function exportDrawFunctionCode() {
-    // Generates JavaScript code for a draw function based on current shapes
+    // Generates JavaScript code for a draw function AND the first layer's data format
     let baseName = 'CustomShip';
     if (currentShipDef && currentShipKey !== '--- New Blank ---') {
         baseName = currentShipKey.replace(/\s+/g, '').replace('Mk', 'Mk');
     }
     let functionName = `draw${baseName}_Edited`;
     let code = [];
-    code.push(`// --- Generated draw function for ${baseName} (Edited) ---`);
-    code.push(`// --- Base Ship Size (for reference): ${currentShipDef ? currentShipDef.size : 'N/A (Custom)'} ---`);
+    code.push(`// --- Generated Export for ${baseName} (Edited) ---`);
     code.push(`// --- Contains ${shapes.length} shape layer(s) ---`);
+    code.push(`//`);
+
+    // --- Format 1: First Layer Data (as requested) ---
+    code.push(`// --- Format 1: Data for the First Shape Layer (Index 0) ---`);
+    if (shapes.length > 0 && shapes[0] && shapes[0].vertexData && shapes[0].vertexData.length >= 2) {
+        let firstShape = shapes[0];
+        let vertexDataString = 'vertexData: [ ';
+        vertexDataString += firstShape.vertexData.map(v => `{ x: ${v.x.toFixed(4)}, y: ${v.y.toFixed(4)} }`).join(', ');
+        vertexDataString += ' ],';
+        code.push(vertexDataString);
+
+        let fillColorString = `fillColor: [${firstShape.fillColor ? firstShape.fillColor.map(c => Math.round(c)).join(', ') : '180, 180, 180'}],`;
+        code.push(`        ${fillColorString}`); // Indent for readability within the block
+
+        let strokeColorString = `strokeColor: [${firstShape.strokeColor ? firstShape.strokeColor.map(c => Math.round(c)).join(', ') : '50, 50, 50'}],`;
+        code.push(`        ${strokeColorString}`); // Indent
+
+        let strokeWString = `strokeW: ${typeof firstShape.strokeW === 'number' ? firstShape.strokeW.toFixed(2) : 1}`;
+        code.push(`        ${strokeWString}`); // Indent
+    } else {
+        code.push(`// --- No valid first shape layer found to export data for ---`);
+    }
+    code.push(`// --- End Format 1 ---`);
+    code.push(``);
+    code.push(`//`);
+
+    // --- Format 2: Full Draw Function (existing logic) ---
+    code.push(`// --- Format 2: Complete Draw Function (Includes All Layers) ---`);
+    code.push(`// --- Base Ship Size (for reference): ${currentShipDef ? currentShipDef.size : 'N/A (Custom)'} ---`);
     code.push(`function ${functionName}(s, thrusting = false) {`);
     code.push(`    let r = s / 2; // Calculate radius based on the desired draw size 's'`);
     code.push(``);
@@ -776,9 +805,9 @@ function exportDrawFunctionCode() {
         let shape = shapes[i];
         if (!shape?.vertexData || shape.vertexData.length < 2) continue;
         code.push(`    // --- Shape Layer ${shapes.length - i} (Index ${i} in editor) ---`);
-        code.push(`    fill(${shape.fillColor ? shape.fillColor.join(', ') : '150, 150, 150'});`);
-        code.push(`    stroke(${shape.strokeColor ? shape.strokeColor.join(', ') : '50, 50, 50'});`);
-        code.push(`    strokeWeight(max(0, ${typeof shape.strokeW === 'number' ? shape.strokeW.toFixed(2) : 1}));`);
+        code.push(`    fill(${shape.fillColor ? shape.fillColor.map(c => Math.round(c)).join(', ') : '150, 150, 150'});`); // Use Math.round for cleaner output
+        code.push(`    stroke(${shape.strokeColor ? shape.strokeColor.map(c => Math.round(c)).join(', ') : '50, 50, 50'});`); // Use Math.round
+        code.push(`    strokeWeight(max(0.5, ${typeof shape.strokeW === 'number' ? shape.strokeW.toFixed(2) : 1}));`); // keep max for safety
         code.push(`    beginShape();`);
         shape.vertexData.forEach(v => {
             if (typeof v?.x === 'number' && typeof v?.y === 'number') {
@@ -791,16 +820,24 @@ function exportDrawFunctionCode() {
     if (currentShipDef && currentShipKey !== '--- New Blank ---' && currentShipDef.drawFunction) {
         try {
             let originalFuncStr = currentShipDef.drawFunction.toString();
-            let engineGlowMatch = originalFuncStr.match(/if\s*\(\s*thrusting\s*\)\s*\{([\s\S]*?)\}\s*(?![^{]*\{)/);
+            // More robust regex to capture the 'if (thrusting)' block, handling variations in spacing and potential comments
+            let engineGlowMatch = originalFuncStr.match(/if\s*\(\s*thrusting\s*\)\s*\{([\s\S]*?)\}\s*(?:;|\n|\r\n)?\s*(?![^{]*\{)/);
+
             if (engineGlowMatch && engineGlowMatch[1]) {
-                code.push(`    // --- Engine glow (copied from original base: ${currentShipDef.name}) ---`);
+                code.push(`    // --- Engine glow (attempted copy from original base: ${currentShipDef.name}) ---`);
+                // Basic re-indentation
                 let glowCode = engineGlowMatch[1].trim().split('\n').map(line => '    ' + line.trim()).join('\n');
                 code.push(`    if (thrusting) {`); code.push(glowCode); code.push(`    }`); code.push(``);
-            } else { code.push(`    // --- Engine glow code not found or matched in base function structure ---`); code.push(``); }
+            } else {
+                console.warn(`Engine glow block not matched in ${currentShipDef.name}. Regex might need adjustment or function structure differs.`);
+                code.push(`    // --- Engine glow code not found or matched in base function structure ---`); code.push(``);
+            }
         } catch (e) { console.error("Error copying engine glow code:", e); code.push(`    // --- Error encountered trying to copy engine glow code ---`); code.push(``); }
     } else { code.push(`    // --- No engine glow defined for base (or custom ship) ---`); code.push(``); }
-    code.push(`}`); code.push(`// --- End Generated Function ---`);
-    saveStrings(code, `${functionName}.js`, 'js');
+    code.push(`}`); code.push(`// --- End Format 2 ---`);
+    code.push(`// --- End Generated Function ---`); // Kept original ending comment
+
+    saveStrings(code, `${functionName}_ExportData.js`, 'js'); // Update filename slightly
 }
 
 // --- Utility Functions ---
